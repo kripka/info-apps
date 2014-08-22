@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Circle Packing</title>
+		<link href='http://fonts.googleapis.com/css?family=Goudy+Bookletter+1911' rel='stylesheet' type='text/css'>
+		<style>
+		body {
+			background-color: #a34324;
+		}
+		
+		svg {
+			display: block;
+			margin: 50px auto;
+		}
+		
+	/*
+	circle {
+		  fill: #ee9c21;
+		  fill-opacity: .8;
+		stroke:#de8642;
+		stroke-width:1px;
+		}
+		
+		.leaf circle {
+		  fill: #a34324;
+		  fill-opacity: 1;
+		  stroke:white;
+		  stroke-opacity:.5;
+		}
+*/
+
+		circle {
+		  fill: #779c07;
+		  fill-opacity: .8;
+		stroke:#85a918;
+		stroke-width:1px;
+		}
+		
+		.leaf circle {
+		  fill: #4e8834;
+		  fill-opacity: 1;
+		  stroke:white;
+		  stroke-opacity:.2;
+		}
+		
+		
+		#tooltip {
+			font-family: 'Goudy Bookletter 1911', serif;
+			padding: 4px 8px;
+			background-color: #f9eabe;
+			font-size: 16px;
+			letter-spacing: .05em;
+			-webkit-box-shadow: 0 0 .4em rgba(0,0,0,.3);
+			-moz-box-shadow: 0 0 .4em rgba(0,0,0,.3);
+			box-shadow: 0 0 .4em rgba(0,0,0,.3);
+		}
+		
+		
+		*{ margin: 0; padding: 0;}
+
+body {
+	/*To hide the horizontal scroller appearing during the animation*/
+	overflow: hidden;
+}
+
+
+#clouds{
+	position: absolute;
+	z-index: -1;
+	top:0;
+	left: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	width:100%;
+	height: 100%;
+	padding:0;
+	padding-top: 200px;
+	background: #c9dbe9;
+	background: -webkit-linear-gradient(top, #c9dbe9 0%, #fff 100%);
+	background: -linear-gradient(top, #c9dbe9 0%, #fff 100%);
+	background: -moz-linear-gradient(top, #c9dbe9 0%, #fff 100%);
+}
+
+/*Time to finalise the cloud shape*/
+.cloud {
+	width: 200px; height: 60px;
+	background: #fff;
+	
+	border-radius: 200px;
+	-moz-border-radius: 200px;
+	-webkit-border-radius: 200px;
+	
+	position: relative; 
+}
+
+.cloud:before, .cloud:after {
+	content: '';
+	position: absolute; 
+	background: #fff;
+	width: 100px; height: 80px;
+	position: absolute; top: -15px; left: 10px;
+	
+	border-radius: 100px;
+	-moz-border-radius: 100px;
+	-webkit-border-radius: 100px;
+	
+	-webkit-transform: rotate(30deg);
+	transform: rotate(30deg);
+	-moz-transform: rotate(30deg);
+}
+
+.cloud:after {
+	width: 120px; height: 120px;
+	top: -55px; left: auto; right: 15px;
+}
+
+/*Time to animate*/
+.x1 {
+	-webkit-animation: moveclouds 15s linear infinite;
+	-moz-animation: moveclouds 15s linear infinite;
+	-o-animation: moveclouds 15s linear infinite;
+}
+
+/*variable speed, opacity, and position of clouds for realistic effect*/
+.x2 {
+	left: 200px;
+	
+	-webkit-transform: scale(0.6);
+	-moz-transform: scale(0.6);
+	transform: scale(0.6);
+	opacity: 0.6; /*opacity proportional to the size*/
+	
+	/*Speed will also be proportional to the size and opacity*/
+	/*More the speed. Less the time in 's' = seconds*/
+	-webkit-animation: moveclouds 25s linear infinite;
+	-moz-animation: moveclouds 25s linear infinite;
+	-o-animation: moveclouds 25s linear infinite;
+}
+
+.x3 {
+	left: -250px; top: -200px;
+	
+	-webkit-transform: scale(0.8);
+	-moz-transform: scale(0.8);
+	transform: scale(0.8);
+	opacity: 0.8; /*opacity proportional to the size*/
+	
+	-webkit-animation: moveclouds 20s linear infinite;
+	-moz-animation: moveclouds 20s linear infinite;
+	-o-animation: moveclouds 20s linear infinite;
+}
+
+.x4 {
+	left: 470px; top: -250px;
+	
+	-webkit-transform: scale(0.75);
+	-moz-transform: scale(0.75);
+	transform: scale(0.75);
+	opacity: 0.75; /*opacity proportional to the size*/
+	
+	-webkit-animation: moveclouds 18s linear infinite;
+	-moz-animation: moveclouds 18s linear infinite;
+	-o-animation: moveclouds 18s linear infinite;
+}
+
+.x5 {
+	left: -150px; top: -150px;
+	
+	-webkit-transform: scale(0.8);
+	-moz-transform: scale(0.8);
+	transform: scale(0.8);
+	opacity: 0.8; /*opacity proportional to the size*/
+	
+	-webkit-animation: moveclouds 20s linear infinite;
+	-moz-animation: moveclouds 20s linear infinite;
+	-o-animation: moveclouds 20s linear infinite;
+}
+
+@-webkit-keyframes moveclouds {
+	0% {margin-left: 100%;}
+	100% {margin-left: -100%;}
+}
+@-moz-keyframes moveclouds {
+	0% {margin-left: 100%;}
+	100% {margin-left: -100%;}
+}
+@-o-keyframes moveclouds {
+	0% {margin-left: 100%;}
+	100% {margin-left: -100%;}
+}
+		
+		</style>
+		
+	</head>
+	<body>
+	
+	<!-- clouds "borrowed" from http://thecodeplayer.com/walkthrough/pure-css3-animated-clouds-background -->
+	<div id="clouds">
+	<div class="cloud x1"></div>
+	<!-- Time for multiple clouds to dance around -->
+	<div class="cloud x2"></div>
+	<div class="cloud x3"></div>
+	<div class="cloud x4"></div>
+	<div class="cloud x5"></div>
+</div>
+	
+	<div id="chordata-1758"></div>
+	
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script>
+	
+	var tooltip = d3.select("body")
+	.append("div")
+	.style("position", "absolute")
+	.style("z-index", "10")
+	.style("visibility", "hidden")
+	.attr('id','tooltip');
+	
+	var widthOrHeight = function(){
+		return ($(window).height() > $(window).width()) ? $(window).width() : $(window).height();
+	};
+	
+	function capitalize(string){
+	    return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+
+	
+	var circlePack = function(elem,file){
+			
+		var padding = 50,
+			diameter = widthOrHeight() - (padding*2);
+		
+		var pack = d3.layout.pack()
+		    .size([diameter - 4, diameter - 4])
+		    .value(function(d) { return 1; });
+		  
+		var svg =  d3.select(elem).append('svg')
+			.attr('width',diameter).attr('height',diameter).append('g')
+				.attr('transform','translate(2,2)');
+				
+		d3.json(file,function(error,root){
+		
+		//called with every property and it's value
+var genus,species_count = 0;
+
+function traverse(o) {
+    for (var i in o) {
+       // func.apply(this,[i,o[i]]);  
+        if (typeof(o[i])=="object") {
+	        switch (o[i].flavor) {
+		        case 'genus':
+		        	genus = o[i].name;
+		        case 'species':
+		        	o[i].name = genus + ' ' + o[i].name;
+		        	species_count++;
+	        }
+        }
+        
+        
+        if (o[i] !== null && typeof(o[i])=="object") {
+            //going on step down in the object tree!!
+            traverse(o[i]);
+        }
+    }
+}
+
+traverse(root);
+		
+		/*
+	var class_name,order_name,family,genus;
+			for (var i=0; i<root.children.length; i++) {
+				for (var j=0; j<root.children[i].children.length; j++) {
+					class_name = root.children[i].name;
+					for (var k=0; k<root.children[j].children.length; k++) {
+						order_name = root.children[i].children[k].name;
+						for (var l=0; l<root.children[k].children.length; l++) {
+							family = root.children[i].children[k].children[l].name;
+							for (var m=0; m<root.children[l].children.length; m++) {
+								genus = root.children[i].children[k].children[l].children[m].name;
+								for (var n=0; n<root.children[i].children[k].children[l].children[m].children.length; m++) {
+								
+								}
+							}
+						}
+					}
+					
+				}
+			}
+*/
+
+			
+		
+			var node = svg.datum(root).selectAll('.node')
+				.data(pack.nodes)
+				.enter().append('g')
+				.attr("class", function(d) { return d.children ? "node" : "leaf node"; })
+				.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+				 
+			node.append("circle")
+				.attr("r", function(d) { return d.r; })
+				.attr('class',function(d){return d.flavor;})
+				.on("mouseover", function(){
+					var that = this;
+					
+					if (typeof that.__data__.name === 'undefined') {
+						tooltip.text("1758 : " + species_count + ' species');
+					} else {
+						tooltip.text(capitalize(that.__data__.flavor) + ' : ' + that.__data__.name);
+					}
+					
+					tooltip.style("visibility", "visible");
+					/*
+if (that.__data__.flavor == 'species') {
+						tooltip.text(that.__data__.name);
+						tooltip.style("visibility", "visible");
+					} else {
+						tooltip.style("visibility", "hidden");
+					}
+*/
+				})
+				.on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+				.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+				/*
+.on('mouseover',function(){
+					var that = this;
+					if (that.__data__.flavor == 'species') {
+						
+					}
+				});
+*/
+
+				
+			
+			
+		}); // end .json
+		
+	} 
+	
+	
+	circlePack('#chordata-1758','1758-chordata-noquotes.json')
+		
+		
+	</script>
+	
+	</body>
+</html>
