@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Chordata Tree of Life</title>
+		<link href='http://fonts.googleapis.com/css?family=Goudy+Bookletter+1911|Lato' rel='stylesheet' type='text/css'>
+		<style>
+		html {
+		    overflow-y: scroll;
+		}
+		*{ margin: 0; padding: 0;
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+			
+		}
+		body {
+			background: #f6efe4 url(img/seamless_paper_texture5.jpg) repeat 0 0;
+			padding-bottom: 20px;
+		}
+		
+		svg {
+			display: block;
+			margin: 0;
+		}
+
+		circle {
+		  fill: #779c07;
+		  stroke:#85a918;
+		  stroke-width:1px;
+		}
+		
+		.leaf circle {
+		  fill: #4e8834;
+		  fill-opacity: 1;
+		  stroke:white;
+		  stroke-opacity:.2;
+		}
+		
+		h1,h2 {
+			font-family: 'Goudy Bookletter 1911',serif;
+			text-align: center;
+			font-size: 4em;
+			font-variant: small-caps;
+			letter-spacing: .1em;
+		}
+		h1 {
+			padding-top: 2em;
+		}
+		h2 {
+			font-size: 2em;
+			margin-bottom: .5em;
+		}
+		p{	
+			font-family: 'Goudy Bookletter 1911',serif;
+			max-width: 350px;
+			margin: 0 auto 2em;
+		}
+		button {
+			border: 0;
+			padding: 8px 15px;
+			background-color: #4e8834;
+			cursor: pointer;
+			color: #fff;
+			display: none;
+		}
+		#loader {
+			display: block;
+			width:100px;
+			height: 30px;
+			background: url(img/ajax-loader.gif) no-repeat center center;
+			margin: 0 auto;
+		}
+		
+		button:hover {
+			background-color: #386a21;
+		}
+		
+		#tooltip {
+			font-family: 'Goudy Bookletter 1911', serif;
+			padding: 4px 8px;
+			background-color: #f9eabe;
+			font-size: 16px;
+			letter-spacing: .05em;
+			-webkit-box-shadow: 0 0 .4em rgba(0,0,0,.3);
+			-moz-box-shadow: 0 0 .4em rgba(0,0,0,.3);
+			box-shadow: 0 0 .4em rgba(0,0,0,.3);
+		}
+		
+		#nav-wrapper {
+			position: fixed;
+			top:0;
+			right:0;
+			display: block;
+			width: 250px;
+			height: 100%;
+			/* background-color: #22211F; */
+			background-color: #2B200C;
+			/* background: #f6efe4 url(img/seamless_paper_texture6.jpg) repeat 0 0; */
+			border-left: 1px solid rgba(0,0,0,.3);
+		}
+		#nav {
+			position: absolute;
+			top:10px;
+			left:0;
+			right:0;
+			bottom: 10px;
+			
+		}
+	
+		#fixed-labels {
+			position: fixed;
+			top:0;
+			left: 0;
+			background-color: #f3e2c6;
+			display: block;
+			width: 100%;
+			height: 50px;
+			box-shadow: 0 2px 4px rgba(0,0,0,.1);
+			border-bottom:1px solid rgba(0,0,0,.2);
+		}
+		#fixed-labels span, #counts span {
+			display: inline-block;
+			font-size: 16px;
+			text-align: center;
+			position: absolute;
+			top:2px;
+			width: 100px;
+			margin-left:-50px;
+			font-family: 'Goudy Bookletter 1911',serif;
+			font-variant: small-caps;
+			letter-spacing: .1em;
+		}
+		#fixed-labels span:nth-child(even) {
+			top: 25px;
+		}
+		
+		#counts span {
+			top:7px;
+		}
+		
+		.branch,.trunk {
+			/*
+stroke: #000;
+			stroke-width: .25px;
+*/
+			fill:#725211;
+		}
+		
+		.branch {
+			fill: transparent;
+			stroke: #725211;
+			stroke-width:2px;
+		}
+		
+		text {
+			font-family: 'Goudy Bookletter 1911',serif;
+		}
+		.year {
+			font-size: 50px;
+		}
+		
+		#draggable {
+			display: block;
+			width:20px;
+			height: 20px;
+			background-color: #779c07;
+			position: absolute;
+			bottom:0;
+			left: -10px;
+			cursor: pointer;
+
+		}
+		#draggable:after {
+				content: '';
+				width:0;
+				height: 0;
+				border-style: solid;
+				border-width: 10px 0 10px 10px;
+				border-color: transparent transparent transparent #779c07;
+				position: absolute;
+				top:0;
+				left:20px;
+			}
+	
+			#nav circle {
+				stroke: transparent;
+				opacity: .4;
+			}
+			
+			#counts {
+				position: fixed;
+				bottom: 0;
+				left:0;
+				background-color: #f3e2c6;
+				width: 100%;
+				display: block;
+				height: 40px;
+				border-top:1px solid rgba(0,0,0,.2);
+			}
+			
+			.divider {
+				stroke:rgba(0,0,0,.1);;
+			}
+			
+			#intro {
+				position: fixed;
+				background-color: #f3e2c6;
+				background: #f6efe4 url(img/seamless_paper_texture6.jpg) repeat 0 0;
+				top:0;
+				left:0;
+				right:0;
+				bottom: 0;
+			}
+
+		</style>
+		
+	</head>
+	<body>
+	
+	<div id="fixed-labels"></div>
+	<div id="counts"></div>
+	<div id="tree"></div>
+	<div id="nav-wrapper">
+		<div id="nav"></div>
+		<div id="draggable"></div>
+	</div>
+	<div id="intro" style="text-align:center;">
+		<h1>Growing the Tree of Life</h1>
+		<h2>Phylum: Chordata</h2>
+		<p>Exploring the years animals in the phylum Chordata were described to science using binomial nomenclature</p>
+		<div id="loader"></div>
+		<button id="start">View Now</button>
+	</div>
+	
+	<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src="js/waypoints.min.js"></script>
+	<script>
+		(function($,sr){
+
+		  // debouncing function from John Hann
+		  // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
+		  var debounce = function (func, threshold, execAsap) {
+		      var timeout;
+		
+		      return function debounced () {
+		          var obj = this, args = arguments;
+		          function delayed () {
+		              if (!execAsap)
+		                  func.apply(obj, args);
+		              timeout = null;
+		          };
+		
+		          if (timeout)
+		              clearTimeout(timeout);
+		          else if (execAsap)
+		              func.apply(obj, args);
+		
+		          timeout = setTimeout(delayed, threshold || 100);
+		      };
+		  }
+		  // smartresize 
+		  jQuery.fn[sr] = function(fn){  return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr); };
+		
+		})(jQuery,'smartresize');
+	</script>
+	<script>
+	
+$(function(){
+	
+	var tooltip = d3.select("body")
+		.append("div")
+		.style("position", "absolute")
+		.style("z-index", "10")
+		.style("visibility", "hidden")
+		.attr('id','tooltip');
+	
+	var widthLessNav = function(nav_width){
+		return $(window).width() - nav_width;
+	};
+	
+	function capitalize(string){
+	    return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+	
+	
+	// cache some variables
+	var nav_width = 250,
+		svg_width = widthLessNav(nav_width),
+		svg_padding = 10,
+		trunk_width = 20,
+		year_height = 400,
+		initialized = false,
+		scroll;
+	
+	var svg = d3.select('#tree').append('svg')
+		.attr({
+			width: svg_width,
+			height: 1
+		});
+		
+	var nav_svg = d3.select('#nav').append('svg')
+		.attr({
+			width: nav_width,
+			height: 1
+		});
+		
+			var left_or_right = function(circle) {
+				if (circle.cx < svg_width/2) {
+					return 'left';
+				}	else {
+					return 'right';
+				}
+			};
+				
+		
+	// i could loop thru data and get these, but let's be lazy-- maybe if I want to expand to phylums for final project
+	var class_array = ['Actinopterygii','Amphibia','Appendicularia','Ascidiacea','Aves','Cephalaspidomorphi','Cephalochordata','Elasmobranchii','Holocephali',
+'Mammalia','Myxini','Reptilia','Sarcopterygii','Thaliacea'];
+
+
+		//lazy
+		var place_left_labels = d3.scale.linear().domain([0,class_array.length/2 - 1]).range([100,svg_width/2 - trunk_width/2 -50 ]);
+		var place_right_labels = d3.scale.linear().domain([class_array.length/2,class_array.length-1]).range([svg_width/2 + trunk_width/2 +50,svg_width - 100/2  ]);
+
+		// add the labels to the fixed labels div
+		for (var i = 0;i < class_array.length;i++) {
+			d3.select('#fixed-labels').append('span').text(class_array[i])
+				.style('left',function(){
+					if (i < 7) {
+						return place_left_labels(i) + 'px';
+					} else {
+						return place_right_labels(i) + 'px';
+					}
+				});
+		}
+		
+		// counts
+		for (var i = 0; i < class_array.length;i++){
+			d3.select('#counts').append('span').text('0')
+				.style('left',function(){
+					if (i < 7) {
+						return place_left_labels(i) + 'px';
+					} else {
+						return place_right_labels(i) + 'px';
+					}
+				}).attr('class',class_array[i]);
+		}
+		
+	
+	var file = 'chordata-counts.json';
+	
+	
+	var build_tree = function(svg,data,svg_width,trunk_width,max_circle_radius,min,max,year_height,branches,range_bump,droop_limit,year_padding) {
+		
+		// scale circles by area
+		var circle_size = d3.scale.sqrt().domain([min,max]).range([1,max_circle_radius]);
+		//scale function for cx
+		var place_circles = d3.scale.linear().domain([0,class_array.length]).range([range_bump + max_circle_radius/2,svg_width ]);
+		
+		var place_left = d3.scale.linear().domain([0,class_array.length/2 - 1]).range([max_circle_radius,svg_width/2 - trunk_width/2 -50 ]);
+		var place_right = d3.scale.linear().domain([class_array.length/2,class_array.length-1]).range([svg_width/2 + trunk_width/2 + 50,svg_width - max_circle_radius/2  ]);
+		
+		
+		//scale function for cy to make it look like heavier ones are droopier
+		var droop;
+		if (svg == nav_svg) {
+			droop = d3.scale.log().domain([min,max]).range([0,0]);
+		} else {
+			var droop = d3.scale.log().domain([min,max]).range([year_height-1,max_circle_radius]);
+		}
+		
+		
+		
+		//branch base scale
+		var branch_base = d3.scale.linear().domain([min,max]).range([10,100]);
+
+		
+		// build each year function
+		var create_year = function(vals,year,order){
+			var g = svg.append('g').attr('id','year-' + year);
+			
+			if (branches){
+				g.append('line')
+					.attr({
+						x1:0,
+						y1:10,
+						x2:svg_width,
+						y2:10
+					}).attr('class','divider');
+			}
+			
+			// append tree trunk
+			if(branches){
+			g.append('rect').attr('class','trunk')
+				.attr({
+					x: svg_width/2 - trunk_width/2,
+					y: (year == 2014) ? year_height/2 : 0,
+					width: trunk_width,
+					height: (year == 2014) ? year_height/2 : year_height
+				});
+			}	
+			
+
+			
+			
+			var branch2 = function(x1,y1,x2,y2,placement,count) {
+				var path;
+				var branch_data = [];
+				
+				var temp_data;
+				var mid = svg_width/2,
+					diff_left;
+					
+				branch_data.push({x:x1,y:y1});
+				
+				branch_data.push({
+					x:x1,
+					y: y2
+				});
+				
+				branch_data.push({x:x2,y:y2});
+				
+								
+				var line_function = d3.svg.line()
+					.x(function(d){return d.x;})
+					.y(function(d){return d.y;})
+					.interpolate('linear');
+				
+				return line_function(branch_data);
+			};
+			
+			
+			if (branches) {
+			g.selectAll('.branch').data(vals).enter().append('path')
+				.attr('d',function(d){
+					var i = class_array.indexOf(d.name);
+					var x1;
+					if (i < 7) {
+						x1 = place_left(i);
+					} else {
+						x1 = place_right(i);
+					}
+					var	y1 = droop(d.count),
+						x2 = svg_width/2,
+						y2 = year_height,
+						place = (x1 > svg_width/2) ? 'right' : 'left';
+					return branch2(x1,y1,x2,y2,place,d.count);
+				})
+				.attr('class','branch');
+			}	
+			
+			
+			if (svg == nav_svg) {
+				g.selectAll('.leaf.leaf-nav').data(vals).enter().append('circle')
+					.attr('r',function(d){return circle_size(d.count);})
+					.attr('cx',function(d){
+						return place_circles(class_array.indexOf(d.name));
+					})
+					.attr('cy',function(d){
+						return droop(d.count);
+					})
+					.attr('class',function(d){return 'leaf leaf-nav ' + d.name});
+			} else {
+				g.selectAll('.leaf.leaf-main').data(vals).enter().append('circle')
+					.attr('r',function(d){return circle_size(d.count);})
+					.attr('cx',function(d){
+						var i = class_array.indexOf(d.name);
+						if (i < class_array.length/2) {
+							return place_left(i);
+						} else {
+							return place_right(i);
+						}
+					})
+					.attr('cy',function(d){
+						return droop(d.count);
+					})
+					.attr('class',function(d){return 'leaf leaf-main ' + d.name})
+					.on("mouseover", function(){
+						var that = this;
+						tooltip.text(that.__data__.name + ' : ' + that.__data__.count);
+						tooltip.style("visibility", "visible");
+					})
+					.on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+					.on("mouseout", function(){return tooltip.style("visibility", "hidden");});	
+				}
+				
+				
+
+		
+			g.attr('transform','translate(0,'+ (year_height * order) +')');
+			
+		};
+		
+		// cache this for some math footwork
+		var year_count = data.length - 1;
+		
+		// loop thru data and build each year
+		for (var i=0; i<data.length; i++) {
+			create_year(data[i].counts,data[i].year,year_count);
+			year_count--;				
+		} // end for
+		
+		// at the end make sure the svg is as tall as the viz
+		if (!branches){
+			svg.attr('height', (data.length * year_height) + max_circle_radius);
+		} else {
+			svg.attr('height', data.length * year_height).attr('width',svg_width);
+		}
+
+			
+	};
+	
+	
+	var makeViz = function(data){
+			
+		// need to know which circle will have the most counts to set scale	
+		var get_max = function(data) {
+			var arr = [];
+			for (c in data) {
+				for (e in data[c]['counts']){
+					arr.push(data[c]['counts'][e].count);
+				}
+			}
+			return d3.max(arr);
+		};
+		var max = get_max(data);
+		
+		// need to know which circle will have the least counts to set scale	
+		var get_min = function(data) {
+			var arr = [];
+			for (c in data) {
+				for (e in data[c]['counts']){
+					arr.push(data[c]['counts'][e].count);
+				}
+			}
+			return d3.min(arr);
+		};
+		var min = get_min(data);
+		
+		build_tree(svg,data,widthLessNav(nav_width),20,100,min,max,year_height,true,64,20,50);
+		build_tree(nav_svg,data,nav_width,5,10,min,max,($(window).height() - 20)/data.length,false,24,1.5);
+
+		
+		// tree cap
+		svg_width = widthLessNav(nav_width);
+		d3.select('#tree svg #year-2014').append('circle')
+			.attr({
+				r: trunk_width/2,
+				cx: svg_width/2,
+				cy: year_height/2
+			})
+			.attr('class','trunk')
+			.style('stroke-width',0);
+		
+		// year labels
+		d3.selectAll('#tree svg g').each(function(){
+			var year = d3.select(this).attr('id').replace('year-','');
+			d3.select(this).append('text').text(year)
+				.attr('transform',function(){	
+					if (year % 2) {
+						return 'translate('+(svg_width/2-115)+','+( year_height/2)+')';
+					} else {
+						return 'translate('+(svg_width/2+20)+','+(year_height/2)+')'
+					}
+				})
+				.style('fill','#444')
+				.attr('class','year');
+				
+		});
+	
+		// bottom tree
+		d3.select('#tree svg').append('rect').attr('class','trunk')
+				.attr({
+					x: svg_width/2 - trunk_width/2,
+					y: d3.select('#tree svg').attr('height'),
+					width: trunk_width,
+					height: 40
+				});
+		d3.select('#tree svg').attr('height',function(){
+			return parseInt(d3.select('#tree svg').attr('height')) + 40;
+		});
+
+				
+		
+		//nav ticks
+		var tick_interval = nav_svg.attr('height')/data.length;
+		var nav_ticks = nav_svg.append('g');
+		for (var i = 0; i<data.length;i++){
+			nav_ticks.append('line')
+				.attr({
+					x1: 0,
+					y1: tick_interval*i,
+					x2: (i%2 == 1) ? 10 : 3,
+					y2: tick_interval*i
+				}).style({
+					"stroke-width":'1px',
+					stroke: "#444"
+				});
+		}
+		
+		
+		var dragging = false;
+			
+		//reset draggable on resize
+		if (initialized) {
+			$(":ui-draggable").draggable("destroy");
+			$("#draggable").css('top',($(document).height() - 10) + 'px');	
+			$(window).off('scroll',scroll);		
+		}
+	
+		
+		var drag_scale = d3.scale.linear().domain([0,$('#nav').height()]).range([0,$('#tree svg').height()]);
+		var scroll_scale = d3.scale.linear().domain([0,$('#tree svg').height()]).range([0,$('#nav').height()]);
+		
+		$( "#draggable" ).draggable({ 
+			axis: "y",
+			containment:'#nav-wrapper' ,
+			drag: function(){
+				dragging=true;
+				$('html,body').stop().animate({scrollTop:drag_scale(parseInt($(this).css('top'))) + 'px'},10,false,function(){dragging=false;});
+				
+			}
+		});
+		
+		scroll = function(){
+			if (!dragging) {
+				$('#draggable').animate({'top':scroll_scale($(this).scrollTop()) + 'px'},1);
+			}
+			
+			if ($(this).scrollTop() == $(document).height()) {
+				$('#counts span').text('0');
+			}
+			
+		};
+		
+		$(window).on('scroll',scroll);
+		
+			initialized = true;
+		
+		
+		
+		
+		
+		//$('html,body').scrollTop($(document).height());
+		$('html,body').animate({'scrollTop':$(document).height()},100,false,function(){
+			$('#counts span').text('0');
+		});
+		
+		// reset waypoints on resize
+		$.waypoints('destroy');
+		
+		
+		setTimeout(function(){
+		
+		
+		$('#tree svg g').waypoint({
+			handler: function(direction){
+				var circles = d3.select(this).selectAll('circle');
+				var span,span_val;
+				var year = d3.select(this).attr('id').replace('year-','');
+					if (circles[0].length != 0) {
+					if (direction == 'down') {
+						circles.each(function(d){
+							if (d){
+								span = d3.select('#counts .'+ d.name);
+								span_val = parseInt(span.text());
+								span.text(span_val - this.__data__.count);
+							}
+						});
+					} else {
+						circles.each(function(d){
+							if (d) {
+								span = d3.select('#counts .'+ d.name);
+								span_val = parseInt(span.text());
+								span.text(span_val + this.__data__.count);
+							}
+						});
+					}
+				}
+			},
+			offset: $(window).height() - 420
+		});
+		
+		$('#counts span').text('0');
+		
+		$('#loader').hide();
+		$('button').fadeIn();
+		
+		}, 500);
+	}
+	
+	
+	var data_cache;
+					
+	d3.json(file,function(error,data){
+		
+	
+		makeViz(data);
+		
+		data_cache = data;
+		
+		
+		$(window).smartresize(function(){
+			d3.selectAll('svg *').remove();
+			makeViz(data_cache);
+		});
+		
+		
+	}); //.json 
+	
+	
+	$('button').on('click',function(){$('#intro').hide();});
+	
+	
+});			
+		
+	</script>
+	
+	</body>
+</html>
