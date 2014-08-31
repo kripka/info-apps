@@ -561,7 +561,7 @@ $(function(){
 			var year = d3.select(this).attr('id').replace('year-','');
 			d3.select(this).append('text').text(year)
 				.attr('transform',function(){	
-					if (year % 2) {
+					if (year % 2 ==0) {
 						return 'translate('+(svg_width/2-115)+','+( year_height/2)+')';
 					} else {
 						return 'translate('+(svg_width/2+20)+','+(year_height/2)+')'
